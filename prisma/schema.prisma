@@ -26,8 +26,7 @@ model User {
   name      String
   email     String      @unique
   password  String
-  type      UserType    @default(PACIENT)
-  evolution Evolution[]
+  type      UserType
   pacient   Pacient[]
   report    Report[]
 }
@@ -35,7 +34,7 @@ model User {
 model Evolution {
   id         Int      @id @default(autoincrement())
   name       String
-  pacient    User     @relation(fields: [pacientId], references: [id])
+  pacient    Pacient     @relation(fields: [pacientId], references: [id])
   pacientId  Int
   created_at DateTime @default(now())
   text       String
@@ -47,8 +46,8 @@ model Pacient {
   doctor   User     @relation(fields: [doctorId], references: [id])
   doctorId Int
   name     String
-  cpf      String
   reports  Report[]
+  evolution Evolution[]
 }
 
 model Report {

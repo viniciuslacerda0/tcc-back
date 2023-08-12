@@ -1,13 +1,16 @@
-version: "3.9"
+version: '3.8'
 
 services:
-  database:
-    container_name: tcc-bd-postgres
-    image: postgres
-    restart: always
+  postgres:
+    image: postgres:latest
     ports:
-      - 5432:5432
+      - "5432:5432"
     environment:
-      - POSTGRES_USER=tcc
-      - POSTGRES_PASSWORD=1234
-      - POSTGRES_DB=prisma-postgres
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
