@@ -1,0 +1,152 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserType {
+  PROFESSIONAL
+  PACIENT
+}
+
+enum BreathingType {
+  DIAFRAGMATICO
+  COSTAL
+  MISTO
+}
+
+model User {
+  id        Int         @id @default(autoincrement())
+  name      String
+  email     String      @unique
+  password  String
+  type      UserType    @default(PACIENT)
+  evolution Evolution[]
+  pacient   Pacient[]
+  report    Report[]
+}
+
+model Evolution {
+  id         Int      @id @default(autoincrement())
+  name       String
+  pacient    User     @relation(fields: [pacientId], references: [id])
+  pacientId  Int
+  created_at DateTime @default(now())
+  text       String
+  pictures   String[] @default([])
+}
+
+model Pacient {
+  id       Int      @id @default(autoincrement())
+  doctor   User     @relation(fields: [doctorId], references: [id])
+  doctorId Int
+  name     String
+  cpf      String
+  reports  Report[]
+}
+
+model Report {
+  id                       Int                       @id @default(autoincrement())
+  pacient                  Pacient                   @relation(fields: [pacientId], references: [id])
+  pacientId                Int
+  doctor                   User                      @relation(fields: [doctorId], references: [id])
+  doctorId                 Int
+  pacientData              PacientData?
+  clinicalData             ClinicalData?
+  clinicalPhysicalExamData ClinicalPhysicalExamData?
+  avaliationData           AvaliationData?
+  treatmentData            TreatmentData?
+}
+
+model PacientData {
+  id                    Int      @id @default(autoincrement())
+  report                Report   @relation(fields: [reportId], references: [id])
+  reportId              Int      @unique
+  name                  String
+  age                   Int
+  sex                   String
+  color                 String
+  maritalStatus         String
+  weight                String
+  height                String
+  educationDegree       String
+  profession            String
+  address               String
+  cellphone             String
+  consultationDate      DateTime @default(now())
+  consultatedBy         String
+  reasonForConsultation String
+  followUp              String
+}
+
+model ClinicalData {
+  id            Int     @id @default(autoincrement())
+  report        Report  @relation(fields: [reportId], references: [id])
+  reportId      Int     @unique
+  qp            String
+  hda           String
+  hpp           String
+  familyHistory String
+  hasAllergy    Boolean
+  hasDiabetes   Boolean
+  hasHas        Boolean
+  hasPneumonia  Boolean
+  isCardiopath  Boolean
+  isObese       Boolean
+  isSmoker      Boolean
+  painType      String
+  medication    String
+}
+
+model ClinicalPhysicalExamData {
+  id                    Int    @id @default(autoincrement())
+  report                Report @relation(fields: [reportId], references: [id])
+  reportId              Int    @unique
+  fr                    String
+  fc                    String
+  articulationAmplitude String
+  goniometry            String
+  muscleStrength        String
+  instrospection        String
+  marchType             String
+  pa                    String
+  palpation             String
+  periometry            String
+  complementaryExams    String
+}
+
+model AvaliationData {
+  id                  Int           @id @default(autoincrement())
+  report              Report        @relation(fields: [reportId], references: [id])
+  reportId            Int           @unique
+  breathingType       BreathingType
+  characteristics     String
+  cognitiveDeficit    Boolean
+  fracture            Boolean
+  fractureLocation    String
+  otherObservations   String?
+  painCharacteristics String
+  painDuration        String
+  painHappens         Boolean
+  painIntensity       String
+  painLocation        String
+  spasm               Boolean
+  spasmLocation       String
+  visualDeficit       Boolean
+  auditoryDeficit     Boolean
+}
+
+model TreatmentData {
+  id                       Int    @id @default(autoincrement())
+  report                   Report @relation(fields: [reportId], references: [id])
+  reportId                 Int    @unique
+  fisioterapeuticDiagnosis String
+  fisioterapeuticTreatment String
+  observations             String
+}
