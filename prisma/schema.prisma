@@ -22,19 +22,19 @@ enum BreathingType {
 }
 
 model User {
-  id        Int         @id @default(autoincrement())
-  name      String
-  email     String      @unique
-  password  String
-  type      UserType
-  pacient   Pacient[]
-  report    Report[]
+  id       Int       @id @default(autoincrement())
+  name     String
+  email    String    @unique
+  password String
+  type     UserType
+  pacient  Pacient[]
+  report   Report[]
 }
 
 model Evolution {
   id         Int      @id @default(autoincrement())
   name       String
-  pacient    Pacient     @relation(fields: [pacientId], references: [id])
+  pacient    Pacient  @relation(fields: [pacientId], references: [id])
   pacientId  Int
   created_at DateTime @default(now())
   text       String
@@ -42,11 +42,11 @@ model Evolution {
 }
 
 model Pacient {
-  id       Int      @id @default(autoincrement())
-  doctor   User     @relation(fields: [doctorId], references: [id])
-  doctorId Int
-  name     String
-  reports  Report[]
+  id        Int         @id @default(autoincrement())
+  doctor    User        @relation(fields: [doctorId], references: [id])
+  doctorId  Int
+  name      String
+  reports   Report[]
   evolution Evolution[]
 }
 
@@ -129,6 +129,7 @@ model AvaliationData {
   cognitiveDeficit    Boolean
   fracture            Boolean
   fractureLocation    String
+  limitation          String
   otherObservations   String?
   painCharacteristics String
   painDuration        String

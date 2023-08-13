@@ -6,16 +6,22 @@ import { AppError } from '../errors/AppErrors';
 export class PacientController {
   async getPacients(request: Request, response: Response): Promise<Response> {
     try {
-      const { id } = request.body;
+      const { doctorId } = request.query;
+      const filter = request.query?.filter as { name: string };
+
       const pacients = await prismaClient.pacient.findMany({
         where: {
-          doctorId: Number(id),
-          name: {
-            contains: request.body?.filter?.name
+          doctorId: {
+            equals: Number(doctorId)
+          },
+          AND: {
+            name: {
+              contains: filter?.name
+            }
           }
         },
         take: 10,
-        cursor: request.body?.cursor,
+        cursor: request.query?.cursor ? { id: Number(request.query?.cursor) } : undefined,
         orderBy: {
           name: 'desc'
         }

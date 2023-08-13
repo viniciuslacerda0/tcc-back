@@ -7,19 +7,18 @@ import { randomUUID } from 'crypto';
 export class ReportController {
   async createReport(request: Request, response: Response): Promise<Response> {
     try {
-      const { id, pacientId, pacientData, clinicalData, clinicalPhysicalExamData, avaliationData, treatmentData } = request.body;
-      await prismaClient.pacient.create({
+      const { doctorId, pacientData, clinicalData, clinicalPhysicalExamData, avaliationData, treatmentData } = request.body;
+      const pacient = await prismaClient.pacient.create({
         data: {
-          id: Number(pacientId),
-          doctorId: Number(id),
+          doctorId: Number(doctorId),
           name: String(pacientData.name)
         }
       });
 
       const report = await prismaClient.report.create({
         data: {
-          doctorId: Number(id),
-          pacientId: Number(pacientId),
+          doctorId: Number(doctorId),
+          pacientId: pacient.id,
           avaliationData: {
             create: avaliationData
           },
@@ -40,7 +39,6 @@ export class ReportController {
 
       const user = await prismaClient.user.create({
         data: {
-          id: Number(pacientId),
           email: String(pacientData.name),
           name: String(pacientData.name),
           password: randomUUID(),
@@ -59,10 +57,12 @@ export class ReportController {
 
   async getReport(request: Request, response: Response): Promise<Response> {
     try {
-      const { id } = request.body;
+      const { pacientId } = request.query;
       const report = await prismaClient.report.findFirst({
         where: {
-          pacientId: Number(id)
+          pacientId: {
+            equals: Number(pacientId)
+          }
         },
         include: {
           pacientData: true,
