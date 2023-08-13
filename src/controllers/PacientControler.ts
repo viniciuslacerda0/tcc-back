@@ -6,16 +6,16 @@ import { AppError } from '../errors/AppErrors';
 export class PacientController {
   async getPacients(request: Request, response: Response): Promise<Response> {
     try {
-      const { id, filter: { name }, cursor } = request.body;
+      const { id } = request.body;
       const pacients = await prismaClient.pacient.findMany({
         where: {
           doctorId: Number(id),
           name: {
-            contains: name
+            contains: request.body?.filter?.name
           }
         },
         take: 10,
-        cursor,
+        cursor: request.body?.cursor,
         orderBy: {
           name: 'desc'
         }

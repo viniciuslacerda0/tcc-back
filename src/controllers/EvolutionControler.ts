@@ -22,19 +22,18 @@ export class EvolutionController {
 
   async getPacientEvolution(request: Request, response: Response): Promise<Response> {
     try {
-      const { id, filter: { from, until, textFilter }, cursor } = request.body;
       const evolutions = await prismaClient.evolution.findMany({
         where: {
-          pacientId: Number(id),
+          pacientId: Number(request.body.id),
           created_at: {
-            in: [from, until]
+            in: [request.body?.filter?.from, request.body?.filter?.until]
           },
           text: {
-            contains: textFilter
+            contains: request.body?.filter?.textFilter
           }
         },
         take: 10,
-        cursor,
+        cursor: request.body?.cursor,
         orderBy: {
           created_at: 'desc'
         }
