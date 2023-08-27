@@ -60,7 +60,14 @@ export class EvolutionController {
           }
         };
       }
+      const pagination = request.query?.cursor
+        ? {
+            cursor: { id: Number(request.query.cursor) },
+            skip: 1
+          }
+        : undefined;
       const evolutions = await prismaClient.evolution.findMany({
+        ...pagination,
         where: {
           pacientId: {
             equals: Number(request.query?.pacientId)
@@ -70,13 +77,24 @@ export class EvolutionController {
             ...filterText
           }
         },
-        take: 10,
-        cursor: request.query?.cursor ? { id: Number(request.query?.cursor) } : undefined,
+        take: request.query?.backwards === 'true' ? -5 : 5,
         orderBy: {
           created_at: 'desc'
         }
       });
-      return response.status(StatusCodes.OK).send(evolutions);
+
+      const totalCount = await prismaClient.evolution.count({
+        where: {
+          pacientId: {
+            equals: Number(request.query?.pacientId)
+          },
+          AND: {
+            ...filterDate,
+            ...filterText
+          }
+        }
+      });
+      return response.status(StatusCodes.OK).send({ evolutions, totalCount });
     } catch (err) {
       if (err instanceof AppError) { return response.status(err.statusCode).json({ error: err.message }); }
       return response

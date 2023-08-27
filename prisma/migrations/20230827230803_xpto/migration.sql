@@ -117,6 +117,7 @@ CREATE TABLE "AvaliationData" (
     "cognitiveDeficit" BOOLEAN NOT NULL,
     "fracture" BOOLEAN NOT NULL,
     "fractureLocation" TEXT NOT NULL,
+    "limitation" TEXT NOT NULL,
     "otherObservations" TEXT,
     "painCharacteristics" TEXT NOT NULL,
     "painDuration" TEXT NOT NULL,
