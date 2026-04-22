@@ -19,7 +19,12 @@ app.use(function (req, res, next) {
 app.use(cors());
 app.use('/api', router);
 
-app.listen(PORT, () => {
-  console.log(`Server Running PORT: ${PORT}`);
-});
-export { app };
+// Vercel (@vercel/node) injeta a app: default export precisa ser a instância Express.
+// Chamar listen() no serverless dispara modo legado e quebra o deploy.
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Server Running PORT: ${PORT}`);
+  });
+}
+
+export default app;
