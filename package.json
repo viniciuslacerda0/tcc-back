@@ -26,7 +26,8 @@
   "scripts": {
     "dev": "ts-node-dev --exit-child --transpile-only --ignore-watch node_modules src/server.ts",
     "start": "node --loader ts-node/esm ./dist/server.js",
-    "build": "yarn prisma migrate deploy && tsc --excludeFiles src/utils/test.spec.ts",
+    "build": "prisma generate && yarn prisma migrate deploy && tsc --excludeFiles src/utils/test.spec.ts",
+    "postinstall": "prisma generate",
     "test": "jest",
     "prepare": "husky install",
     "lint": "eslint . --ignore-pattern 'dist/**' --ignore-pattern 'node_modules/**'",
