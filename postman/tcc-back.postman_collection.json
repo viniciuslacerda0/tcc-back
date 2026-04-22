@@ -1,0 +1,375 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "TCC Back API",
+    "description": "API Express em `/api` (`src/server.ts`). Variáveis da coleção: `protocol`, `host`, `port` (local padrão **http** + **localhost** + **3333**). Para HTTPS sem porta (ex.: Vercel), deixe `port` vazio e use `protocol` **https**.\n\n**URLs (local padrão)**\n| Método | URL |\n|--------|-----|\n| POST | `http://localhost:3333/api/auth` |\n| POST | `http://localhost:3333/api/create` |\n| GET | `http://localhost:3333/api/get-pacients` |\n| POST | `http://localhost:3333/api/create-evolution` |\n| GET | `http://localhost:3333/api/get-evolution` |\n| POST | `http://localhost:3333/api/create-report` |\n| GET | `http://localhost:3333/api/get-report` |\n| PUT | `http://localhost:3333/api/update-report` |\n\n**Auth:** `Authorization: Bearer {{token}}`. Login e Create user salvam o `token` na coleção.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "protocol",
+      "value": "http"
+    },
+    {
+      "key": "host",
+      "value": "localhost"
+    },
+    {
+      "key": "port",
+      "value": "3333"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  try {",
+                  "    const data = pm.response.json();",
+                  "    if (data.token) { pm.collectionVariables.set('token', data.token); }",
+                  "  } catch (e) { console.warn(e); }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"usuario@email.com\",\n  \"password\": \"sua_senha\"\n}"
+            },
+            "url": {
+              "raw": "{{protocol}}://{{host}}:{{port}}/api/auth",
+              "protocol": "{{protocol}}",
+              "host": ["{{host}}"],
+              "port": "{{port}}",
+              "path": ["api", "auth"]
+            },
+            "description": "URL: `POST {{protocol}}://{{host}}:{{port}}/api/auth`\n\nO campo `username` é o **email** no banco. Resposta: `{ user, token }`."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Create user",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  try {",
+                  "    const data = pm.response.json();",
+                  "    if (data.token) { pm.collectionVariables.set('token', data.token); }",
+                  "  } catch (e) { console.warn(e); }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Dr. Exemplo\",\n  \"email\": \"novo@email.com\",\n  \"password\": \"senha123\",\n  \"type\": \"PROFESSIONAL\"\n}"
+            },
+            "url": {
+              "raw": "{{protocol}}://{{host}}:{{port}}/api/create",
+              "protocol": "{{protocol}}",
+              "host": ["{{host}}"],
+              "port": "{{port}}",
+              "path": ["api", "create"]
+            },
+            "description": "URL: `POST {{protocol}}://{{host}}:{{port}}/api/create`\n\n`type`: `PROFESSIONAL` ou `PACIENT`. Resposta inclui `token`."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Pacients",
+      "item": [
+        {
+          "name": "List pacients (doctor)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{protocol}}://{{host}}:{{port}}/api/get-pacients?doctorId=1&cursor=&backwards=false",
+              "protocol": "{{protocol}}",
+              "host": ["{{host}}"],
+              "port": "{{port}}",
+              "path": ["api", "get-pacients"],
+              "query": [
+                {
+                  "key": "doctorId",
+                  "value": "1",
+                  "description": "ID do médico (User.id)"
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "description": "Cursor paginação (opcional)"
+                },
+                {
+                  "key": "backwards",
+                  "value": "false",
+                  "description": "true = lote invertido (5 itens)"
+                },
+                {
+                  "key": "filter[name]",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "URL: `GET {{protocol}}://{{host}}:{{port}}/api/get-pacients?doctorId=...`\n\nBearer obrigatório."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Evolutions",
+      "item": [
+        {
+          "name": "Create evolution",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Evolução inicial\",\n  \"text\": \"Texto da evolução clínica.\",\n  \"created_at\": \"2026-04-22T12:00:00.000Z\",\n  \"pacientId\": 1,\n  \"pictures\": []\n}"
+            },
+            "url": {
+              "raw": "{{protocol}}://{{host}}:{{port}}/api/create-evolution",
+              "protocol": "{{protocol}}",
+              "host": ["{{host}}"],
+              "port": "{{port}}",
+              "path": ["api", "create-evolution"]
+            },
+            "description": "URL: `POST {{protocol}}://{{host}}:{{port}}/api/create-evolution`"
+          },
+          "response": []
+        },
+        {
+          "name": "List evolutions by pacient",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{protocol}}://{{host}}:{{port}}/api/get-evolution?pacientId=1&cursor=&backwards=false",
+              "protocol": "{{protocol}}",
+              "host": ["{{host}}"],
+              "port": "{{port}}",
+              "path": ["api", "get-evolution"],
+              "query": [
+                {
+                  "key": "pacientId",
+                  "value": "1"
+                },
+                {
+                  "key": "cursor",
+                  "value": ""
+                },
+                {
+                  "key": "backwards",
+                  "value": "false"
+                },
+                {
+                  "key": "filter[from]",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "filter[until]",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "filter[textFilter]",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "URL: `GET {{protocol}}://{{host}}:{{port}}/api/get-evolution?pacientId=...`"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Create report (+ pacient + user PACIENT)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"doctorId\": 1,\n  \"pacientData\": {\n    \"name\": \"Paciente Teste\",\n    \"age\": 45,\n    \"sex\": \"F\",\n    \"color\": \"\",\n    \"maritalStatus\": \"Solteiro\",\n    \"weight\": \"70kg\",\n    \"height\": \"1.65m\",\n    \"educationDegree\": \"Superior\",\n    \"profession\": \"Engenheira\",\n    \"address\": \"Rua A, 100\",\n    \"cellphone\": \"11999990000\",\n    \"consultatedBy\": \"Dr. Exemplo\",\n    \"reasonForConsultation\": \"Dor lombar\",\n    \"followUp\": \"Semanal\"\n  },\n  \"clinicalData\": {\n    \"qp\": \"Dor\",\n    \"hda\": \"HDA exemplo\",\n    \"hpp\": \"HPP exemplo\",\n    \"familyHistory\": \"Nega\",\n    \"hasAllergy\": false,\n    \"hasDiabetes\": false,\n    \"hasHas\": false,\n    \"hasPneumonia\": false,\n    \"isCardiopath\": false,\n    \"isObese\": false,\n    \"isSmoker\": false,\n    \"painType\": \"Mecânica\",\n    \"medication\": \"Nenhuma\"\n  },\n  \"clinicalPhysicalExamData\": {\n    \"fr\": \"16\",\n    \"fc\": \"72\",\n    \"articulationAmplitude\": \"\",\n    \"goniometry\": \"\",\n    \"muscleStrength\": \"\",\n    \"instrospection\": \"\",\n    \"marchType\": \"\",\n    \"pa\": \"120/80\",\n    \"palpation\": \"\",\n    \"periometry\": \"\",\n    \"complementaryExams\": \"\"\n  },\n  \"avaliationData\": {\n    \"breathingType\": \"DIAFRAGMATICO\",\n    \"characteristics\": \"\",\n    \"cognitiveDeficit\": false,\n    \"fracture\": false,\n    \"fractureLocation\": \"\",\n    \"limitation\": \"\",\n    \"otherObservations\": null,\n    \"painCharacteristics\": \"\",\n    \"painDuration\": \"\",\n    \"painHappens\": false,\n    \"painIntensity\": \"\",\n    \"painLocation\": \"\",\n    \"spasm\": false,\n    \"spasmLocation\": \"\",\n    \"visualDeficit\": false,\n    \"auditoryDeficit\": false\n  },\n  \"treatmentData\": {\n    \"fisioterapeuticDiagnosis\": \"\",\n    \"fisioterapeuticTreatment\": \"\",\n    \"observations\": \"\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{protocol}}://{{host}}:{{port}}/api/create-report",
+              "protocol": "{{protocol}}",
+              "host": ["{{host}}"],
+              "port": "{{port}}",
+              "path": ["api", "create-report"]
+            },
+            "description": "URL: `POST {{protocol}}://{{host}}:{{port}}/api/create-report`"
+          },
+          "response": []
+        },
+        {
+          "name": "Get report by pacient",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{protocol}}://{{host}}:{{port}}/api/get-report?pacientId=1",
+              "protocol": "{{protocol}}",
+              "host": ["{{host}}"],
+              "port": "{{port}}",
+              "path": ["api", "get-report"],
+              "query": [
+                {
+                  "key": "pacientId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "URL: `GET {{protocol}}://{{host}}:{{port}}/api/get-report?pacientId=...`"
+          },
+          "response": []
+        },
+        {
+          "name": "Update report",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reportId\": 1,\n  \"pacientData\": {\n    \"name\": \"Paciente Atualizado\",\n    \"age\": 46,\n    \"sex\": \"F\",\n    \"color\": \"\",\n    \"maritalStatus\": \"Casado\",\n    \"weight\": \"71kg\",\n    \"height\": \"1.65m\",\n    \"educationDegree\": \"Superior\",\n    \"profession\": \"Engenheira\",\n    \"address\": \"Rua B, 200\",\n    \"cellphone\": \"11988887777\",\n    \"consultatedBy\": \"Dr. Exemplo\",\n    \"reasonForConsultation\": \"Retorno\",\n    \"followUp\": \"Quinzenal\"\n  },\n  \"clinicalData\": {\n    \"qp\": \"Melhora parcial\",\n    \"hda\": \"\",\n    \"hpp\": \"\",\n    \"familyHistory\": \"\",\n    \"hasAllergy\": false,\n    \"hasDiabetes\": false,\n    \"hasHas\": false,\n    \"hasPneumonia\": false,\n    \"isCardiopath\": false,\n    \"isObese\": false,\n    \"isSmoker\": false,\n    \"painType\": \"\",\n    \"medication\": \"\"\n  },\n  \"clinicalPhysicalExamData\": {\n    \"fr\": \"\",\n    \"fc\": \"\",\n    \"articulationAmplitude\": \"\",\n    \"goniometry\": \"\",\n    \"muscleStrength\": \"\",\n    \"instrospection\": \"\",\n    \"marchType\": \"\",\n    \"pa\": \"\",\n    \"palpation\": \"\",\n    \"periometry\": \"\",\n    \"complementaryExams\": \"\"\n  },\n  \"avaliationData\": {\n    \"breathingType\": \"MISTO\",\n    \"characteristics\": \"\",\n    \"cognitiveDeficit\": false,\n    \"fracture\": false,\n    \"fractureLocation\": \"\",\n    \"limitation\": \"\",\n    \"otherObservations\": null,\n    \"painCharacteristics\": \"\",\n    \"painDuration\": \"\",\n    \"painHappens\": false,\n    \"painIntensity\": \"\",\n    \"painLocation\": \"\",\n    \"spasm\": false,\n    \"spasmLocation\": \"\",\n    \"visualDeficit\": false,\n    \"auditoryDeficit\": false\n  },\n  \"treatmentData\": {\n    \"fisioterapeuticDiagnosis\": \"\",\n    \"fisioterapeuticTreatment\": \"\",\n    \"observations\": \"\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{protocol}}://{{host}}:{{port}}/api/update-report",
+              "protocol": "{{protocol}}",
+              "host": ["{{host}}"],
+              "port": "{{port}}",
+              "path": ["api", "update-report"]
+            },
+            "description": "URL: `PUT {{protocol}}://{{host}}:{{port}}/api/update-report`"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
